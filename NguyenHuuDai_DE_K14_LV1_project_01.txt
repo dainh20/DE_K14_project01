@@ -1,0 +1,53 @@
+
+q1:
+sed -E 's/([^,]), /_/g; s/; /_/g; s/   /_/g ' tmdb-movies.csv | awk -F"," '{print $1, $6, $16}' OFS=,> data_q1.csv
+grep -E '^[^,]+,[^,]+,[0-9]{1,2}/[0-9]{1,2}/[0-9]{2}$' data_q1.csv > cleaned_data_q1.csv
+awk -F'[,/]' 'BEGIN {OFS=","} {print $1, $2, $3, $4, $5}' cleaned_data_q1.csv | awk -F',' 'BEGIN {OFS=","} {if ($5+0 > 25) print $0, $5+1900; else print $0, $5+2000}'| sort -t',' -k6,6nr -k4,4nr -k3,3nr > result_q1.csv
+
+
+q2:
+sed -E 's/([^,]), /_/g; s/; /_/g; s/   /_/g ' tmdb-movies.csv | awk -F"," '{print $1, $6, $18}' OFS=,> data_q2.csv
+awk -F',' 'BEGIN {OFS=","} $3+0 > 7.5 && $3+0 < 10' data_q2.csv > result_q2.csv
+
+
+q3:
+awk -F',' 'BEGIN {OFS=","} {if ($3+0 > max) max=$3+0} END {print "Highest Revenue:", max}' data_q3.csv
+awk -F',' 'BEGIN {OFS=","} {if ($3+0 > max) {max=$3+0; id_max=$1; name_max=$2;} if ($3+0 < min || NR==1) {min=$3+0; id_min=$1; name_min=$2}} END {print "Highest Revenue Film ID:", id_max, "Name:", name_max, "Revenue:", max; print "Lowest Revenue Film ID:", id_min, "Name:", name_min, "Revenue:", min}' data_q3.csv
+
+q4:
+awk -F',' 'BEGIN {OFS=","} {total+=$3+0} END {print "Total Revenue:", total}' data_q3.csv > result_q4.txt
+
+q5:
+awk -F',' '{print $1, $2, $3+0}' data_q3.csv | sort -k3,3nr | head -n 10 > result_q5.txt
+
+
+q6:
+sed -E 's/([^,]), /_/g; s/; /_/g; s/   /_/g ' tmdb-movies.csv | awk -F"," '{print $1, $9}' OFS=,> data_q6.csv
+awk -F, '$2 != "" && $2 !~ /[0-9]/ && $2 !~ /[|]/' data_q6.csv > data_q6_cleaned.csv
+awk -F, '{count[$2]++} END {for (director in count) print director, count[director]}' data_q6_cleaned.csv > count_id_director.csv
+sort -k2,2nr -t',' count_id_director.csv > result1_q6.txt
+
+
+q7:
+sed -E 's/([^,]), /_/g; s/; /_/g; s/   /_/g ' tmdb-movies.csv | awk -F"," '{print $1, $7}' OFS=,> data2_q6.csv
+awk -F, '$2 != ""' data2_q6.csv > data2_q6_cleaned.csv
+awk -F',' '{for(i=2; i<=NF; i++) split($i, actors, "|"); for(actor in actors) counts[actors[actor]]++} END {for(actor in counts) print actor, counts[actor]}' data2_q6_cleaned.csv OFS=,| sort -k2,2nr > count_id_by_cast.csv
+
+
+q7:
+sed -E 's/([^,]), /_/g; s/; /_/g; s/   /_/g ' tmdb-movies.csv | awk -F"," '{print $1, $9}' OFS=,> data_q7.csv
+awk -F',' '$2 != "" && $2 !~ /[0-9]|\s/' data_q7.csv > data_q7_cleaned.csv
+awk -F',' '{for(i=2; i<=NF; i++) split($i, genres, "|"); for(genre in genres) counts[genres[genre]]++} END {for(genre in counts) print genre, counts[genre]}' data_q7_cleaned.csv OFS=,| sort -k2,2nr > count_id_by_genre.csv
+
+
+
+
+
+
+
+
+
+
+
+
+
